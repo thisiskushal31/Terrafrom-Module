@@ -1,5 +1,7 @@
 # Terraform Module Bank — GCP, AWS & Azure
 
+![Banner](./readme-assets/banner.png)
+
 **Standalone** Terraform modules for **GCP**, **AWS**, and (future) **Azure**. Each module contains only GCP/resources—no wrapper, no `module { source = "..." }` calls. Names follow GCP product terminology.
 
 ## Structure
