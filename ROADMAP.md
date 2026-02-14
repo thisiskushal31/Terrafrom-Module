@@ -2,6 +2,8 @@
 
 Every module is **standalone**: only `resource "google_*"` (and similar)—no `module { source = "..." }`, no wrapper. Names follow GCP product terminology.
 
+**Alignment with modules-clone and foundation:** See [MODULES_CLONE_ALIGNMENT.md](./MODULES_CLONE_ALIGNMENT.md) for how this repo maps to **modules-clone** (excluding Facets), **cloud-foundation-training**, and **terraform-example-foundation**, and for full GCP module exposure.
+
 ---
 
 ## GCP modules
@@ -22,6 +24,7 @@ Every module is **standalone**: only `resource "google_*"` (and similar)—no `m
 | Module | Status | Description |
 |--------|--------|-------------|
 | **compute-engine-instance** | Done | Compute Engine instance (single VM) |
+| **kubernetes-engine** | Done | GKE cluster and node pools |
 | **cloud-sql-mysql** | Done | Cloud SQL for MySQL |
 | **cloud-nat** | Done | Cloud NAT and optional Cloud Router |
 
@@ -32,8 +35,17 @@ Every module is **standalone**: only `resource "google_*"` (and similar)—no `m
 | **bigquery** | Done | BigQuery dataset, tables, views |
 | **pubsub** | Done | Pub/Sub topic and subscriptions |
 
-### Planned GCP
-- project-factory, kubernetes-engine (GKE), lb-http, cloud-dns, bootstrap, kms, secret-manager, log-export, etc.
+### Load balancing, DNS, security & observability
+| Module | Status | Description |
+|--------|--------|-------------|
+| **lb-http** | Done | Global HTTP(S) load balancer |
+| **cloud-dns** | Done | Cloud DNS managed zone (public/private) + record sets |
+| **kms** | Done | Cloud KMS key ring + keys + IAM |
+| **secret-manager** | Done | Secret Manager secrets + optional version |
+| **log-export** | Done | Log sink (project/folder/org/billing); SRE: centralised logging, audit |
+
+### Orchestrator-handled (not modules here)
+- **project-factory** and **bootstrap** are run by the infra orchestrator (external Terraform).
 
 ---
 
