@@ -38,6 +38,7 @@ Standalone Terraform modules for **Amazon Web Services**. Each module covers one
 | **step-functions** | Step Functions state machine | Workflow orchestration, ETL, event-driven pipelines |
 | **ecs** | ECS cluster + optional Fargate/EC2 service | Containers without Kubernetes; task definition from caller |
 | **msk** | MSK (Managed Kafka) cluster | Event streaming |
+| **sagemaker** | SageMaker notebook instance | ML dev (Jupyter); training, Studio, endpoints via Registry |
 
 Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and its own `README.md`. Code is standalone (no internal module calls).
 
@@ -49,6 +50,7 @@ Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and its 
 - **Containers:** Use **ecr** for images; use **eks** for Kubernetes or add **ecs** later for Fargate. Wire **alb** in front of EKS Ingress or ECS services.
 - **Apps and APIs:** **lambda** + **apigateway-v2** for serverless APIs; **ec2-instance** for VMs; **rds** for DB; **secrets-manager** or **ssm-parameter** for config; **acm** for TLS certs.
 - **Data and events:** **s3-bucket** for storage; **dynamodb-table** for serverless DB; **sqs** + **sns** or **eventbridge** for queues and events; **emr** for Spark/batch; **redshift** for warehouse; **msk** for Kafka; **step-functions** for workflows.
+- **AI / ML:** **sagemaker** for notebook instances (Jupyter); use with **iam**, **security-group**, **vpc**. For Studio, training jobs, or inference endpoints see the Terraform Registry.
 - **Identity and security:** Create **security-group** and **iam** roles; pass to **lambda**, **ec2-instance**, **eks**, **rds**, **elasticache**, **ecs**, **msk**; use **kms** for encryption; **route53** for DNS.
 
 For cross-cloud comparison (GCP ↔ AWS ↔ Azure), see the main [README](../README.md#cross-cloud-counterparts).
@@ -99,4 +101,4 @@ module "eks" {
 
 ## Other services
 
-For services not in this set (e.g. **Cognito**, **Glue**, **SageMaker**, **Kinesis**, **WAF**), use the [Terraform Registry](https://registry.terraform.io/search/modules?provider=aws) or minimal custom modules.
+For services not in this set (e.g. **Cognito**, **Glue**, **SageMaker Studio / endpoints**, **Kinesis**, **WAF**, **Bedrock**), use the [Terraform Registry](https://registry.terraform.io/search/modules?provider=aws) or minimal custom modules.

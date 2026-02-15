@@ -40,6 +40,7 @@ Which service in one cloud corresponds to which in another. Use this to find the
 | **Scheduling / events** | cloud-scheduler | eventbridge | *TBD* |
 | **IAM / identity** | iam, service-accounts | iam | *TBD* |
 | **Big data / Spark** | dataproc | emr | *TBD* |
+| **AI / ML** | vertex-ai | sagemaker | *TBD* |
 
 Azure column will be filled as modules are added. Per-cloud module lists and "what it's for" are in each cloud's **README** (e.g. [aws/README.md](aws/README.md), [gcp/README.md](gcp/README.md), [azure/README.md](azure/README.md)).
 
