@@ -42,7 +42,12 @@ output "node_iam_role_arn" {
 
 output "oidc_issuer_url" {
   description = "OIDC issuer URL for the cluster (for IRSA / workload identity)"
-  value       = aws_eks_cluster.cluster.oidc[0].issuer
+  value       = try(aws_eks_cluster.cluster.identity[0].oidc[0].issuer, null)
+}
+
+output "oidc_provider_arn" {
+  description = "ARN of the OIDC provider (when enable_irsa = true); use in IAM role trust for IRSA"
+  value       = try(aws_iam_openid_connect_provider.cluster[0].arn, null)
 }
 
 output "aws_cloud" {

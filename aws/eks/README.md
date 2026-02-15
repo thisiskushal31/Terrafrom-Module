@@ -5,10 +5,12 @@ Creates an **Amazon EKS** cluster with optional managed node groups and addons. 
 ## Scope
 
 - `aws_iam_role` + policy attachments for cluster and nodes
-- `aws_eks_cluster` with configurable endpoint and logging
+- `aws_eks_cluster` with configurable endpoint, logging, **access_config** (authentication mode), and optional **OIDC provider for IRSA**
 - `aws_eks_node_group` for each entry in `node_groups`
 - `aws_eks_addon` for each entry in `addons`
-- No VPC, subnets, or extra IAM (use aws/network and IAM modules separately)
+- No VPC, subnets, or extra IAM (use aws/vpc and aws/iam separately)
+
+**Identity / RBAC parity with GKE:** GKE’s **Workload Identity** (pod → GCP SA) is analogous to EKS **IRSA** (pod → IAM role via OIDC). This module enables IRSA by default (`enable_irsa = true`), creating the OIDC provider and exposing `oidc_issuer_url` and `oidc_provider_arn` so you can create IAM roles that pods assume via service account. **access_config.authentication_mode** controls who can call the cluster API (e.g. `API` = IAM access entries).
 
 ## Usage
 
@@ -58,6 +60,9 @@ module "eks" {
 |------|-------------|------|---------|
 | cluster_name | EKS cluster name | `string` | required |
 | cluster_version | Kubernetes version (e.g. 1.28) | `string` | `null` |
+| authentication_mode | API access: CONFIG_MAP, API, or API_AND_CONFIG_MAP | `string` | `"API"` |
+| bootstrap_cluster_creator_admin_permissions | Grant creator admin via bootstrap | `bool` | `false` |
+| enable_irsa | Create OIDC provider for IRSA (pod IAM; like GKE Workload Identity) | `bool` | `true` |
 | subnet_ids | Subnet IDs for cluster and node groups | `list(string)` | required |
 | cluster_endpoint_public_access | Enable public API endpoint | `bool` | `true` |
 | cluster_endpoint_private_access | Enable private API endpoint | `bool` | `true` |
@@ -81,7 +86,8 @@ module "eks" {
 | cluster_version | Kubernetes version |
 | cluster_iam_role_arn | Cluster IAM role ARN |
 | node_iam_role_arn | Node IAM role ARN |
-| oidc_issuer_url | OIDC issuer for IRSA |
+| oidc_issuer_url | OIDC issuer URL (for IRSA) |
+| oidc_provider_arn | OIDC provider ARN when enable_irsa = true (use in IAM role trust for IRSA) |
 | aws_cloud | Map with cluster_name, cluster_arn, cluster_id |
 
 ## Requirements

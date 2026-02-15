@@ -8,6 +8,26 @@ variable "cluster_name" {
   description = "Name of the EKS cluster"
 }
 
+# --- Access / RBAC (who can call the cluster API) ---
+variable "authentication_mode" {
+  type        = string
+  default     = "API"
+  description = "Authentication mode: CONFIG_MAP (legacy), API (IAM access entries), or API_AND_CONFIG_MAP"
+}
+
+variable "bootstrap_cluster_creator_admin_permissions" {
+  type        = bool
+  default     = false
+  description = "Grant cluster creator admin permissions via bootstrap (one-time; prefer access entries for ongoing control)"
+}
+
+# --- IRSA (pods assume IAM roles via OIDC) — analogous to GKE Workload Identity ---
+variable "enable_irsa" {
+  type        = bool
+  default     = true
+  description = "Create OIDC identity provider for IRSA so pods can assume IAM roles via service account (like GKE Workload Identity)"
+}
+
 variable "cluster_version" {
   type        = string
   default     = null

@@ -37,16 +37,38 @@ resource "aws_eks_cluster" "cluster" {
   version  = var.cluster_version
   role_arn = aws_iam_role.cluster.arn
 
+  # Who can access the API: CONFIG_MAP (legacy), API (IAM access entries), or API_AND_CONFIG_MAP
+  access_config {
+    authentication_mode = var.authentication_mode
+    bootstrap_cluster_creator_admin_permissions = var.bootstrap_cluster_creator_admin_permissions
+  }
+
   vpc_config {
     subnet_ids              = var.subnet_ids
     endpoint_public_access   = var.cluster_endpoint_public_access
-    endpoint_private_access = var.cluster_endpoint_private_access
-    public_access_cidrs    = var.public_access_cidrs
+    endpoint_private_access  = var.cluster_endpoint_private_access
+    public_access_cidrs     = var.public_access_cidrs
   }
 
   enabled_cluster_log_types = var.enabled_cluster_log_types
 
   tags = var.tags
+}
+
+# --- OIDC provider for IRSA (IAM Roles for Service Accounts) — GKE Workload Identity analogue ---
+data "tls_certificate" "cluster" {
+  count = var.enable_irsa ? 1 : 0
+  url   = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "cluster" {
+  count = var.enable_irsa ? 1 : 0
+
+  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.cluster[0].certificates[0].sha1_fingerprint]
+
+  tags = merge(var.tags, { Name = "${var.cluster_name}-eks-irsa" })
 }
 
 # --- Node IAM role (shared by all managed node groups) ---
