@@ -2,33 +2,36 @@
 
 ![Banner](./readme-assets/banner.png)
 
-Repository of **standalone** Terraform modules by cloud or organization. Each module owns a single domain (e.g. one cloud’s product); no cross-module resource creation. Dependencies are composed by the caller.
+A library of **standalone** Terraform modules by cloud. Each module manages a single product or service (e.g. one VPC, one Kubernetes cluster, one bucket). Dependencies are composed by the caller; no cross-module resource creation inside modules.
 
-## What’s in this repo
+---
 
-| Folder | Contents |
-|--------|----------|
-| **[gcp/](gcp/README.md)** | Google Cloud — VPC, Compute, Storage, Data, IAM, GKE, Cloud Run, Dataflow, Composer, Vertex AI, and more. See [gcp/README.md](gcp/README.md) for the full module list and usage. |
-| **[aws/](aws/README.md)** | Amazon Web Services — VPC, EKS, S3, EC2, RDS, Lambda, IAM, and more. What each module is for and cross-cloud counterparts in [aws/README.md](aws/README.md). |
-| **[azure/](azure/README.md)** | Microsoft Azure — AKS (cluster + node pools). See [azure/README.md](azure/README.md). *(More Azure modules to be added.)* |
+## What's in this repo
+
+| Folder | What it does |
+|--------|----------------|
+| **[gcp/](gcp/README.md)** | **Google Cloud** — Networking (VPC, NAT), compute (VMs, GKE, Cloud Run), storage (GCS, BigQuery, Datastore), data (Dataflow, Dataproc, Composer), IAM, secrets, DNS, Vertex AI. Full module list and usage in [gcp/README.md](gcp/README.md). |
+| **[aws/](aws/README.md)** | **Amazon Web Services** — Networking (VPC), compute (EC2, EKS, Lambda, ECS), storage (S3, ECR, DynamoDB), data (RDS, Redshift, EMR, MSK), messaging (SQS, SNS, EventBridge), IAM, secrets, DNS, ACM, SageMaker. Full module list and usage in [aws/README.md](aws/README.md). |
+| **[azure/](azure/README.md)** | **Microsoft Azure** — Networking (VNet, NSG), compute (AKS, VMs), load balancer, storage (Storage Account), data (PostgreSQL Flexible Server). Full module list and usage in [azure/README.md](azure/README.md). |
 | **red-hat/** | Red Hat *(planned)* |
 | **oracle/** | Oracle Cloud *(planned)* |
-| **others** | Additional clouds or vendors as added |
 
-Details, module tables, and examples live in each folder’s **README.md** (e.g. [gcp/README.md](gcp/README.md) for GCP).
+Each cloud folder has a **README** with a module table (what each module is and what it’s for), how to use the modules, and an example.
+
+---
 
 ## Cross-cloud counterparts
 
-Which service in one cloud corresponds to which in another. Use this to find the right module when moving or comparing across GCP, AWS, and Azure.
+Use this table to see which service in one cloud matches another when moving or comparing workloads.
 
 | Area | GCP | AWS | Azure |
 |------|-----|-----|--------|
-| **Networking** | network, cloud-nat | vpc | *TBD* |
+| **Networking** | network, cloud-nat | vpc | network |
 | **Managed Kubernetes** | kubernetes-engine | eks | aks |
-| **Compute (VM)** | compute-engine-instance | ec2-instance | *TBD* |
-| **Relational DB** | cloud-sql-mysql | rds | *TBD* |
-| **Object storage** | cloud-storage | s3-bucket | *TBD* |
-| **Load balancing** | lb-http | alb | *TBD* |
+| **Compute (VM)** | compute-engine-instance | ec2-instance | virtual-machine |
+| **Relational DB** | cloud-sql-mysql | rds | postgresql |
+| **Object storage** | cloud-storage | s3-bucket | storage-account |
+| **Load balancing** | lb-http | alb | load-balancer |
 | **DNS** | cloud-dns | route53 | *TBD* |
 | **KMS / keys** | kms | kms | *TBD* |
 | **Secrets** | secret-manager | secrets-manager | *TBD* |
@@ -42,17 +45,19 @@ Which service in one cloud corresponds to which in another. Use this to find the
 | **Big data / Spark** | dataproc | emr | *TBD* |
 | **AI / ML** | vertex-ai | sagemaker | *TBD* |
 
-Azure column will be filled as modules are added. Per-cloud module lists and "what it's for" are in each cloud's **README** (e.g. [aws/README.md](aws/README.md), [gcp/README.md](gcp/README.md), [azure/README.md](azure/README.md)).
+*TBD* = not yet implemented in this repo for that cloud.
+
+---
 
 ## Repo layout
 
 ```
 Terrafrom-Module/
-├── gcp/           # Google Cloud — see gcp/README.md
-├── aws/           # AWS — EKS; see aws/README.md
-├── azure/         # Azure — AKS; see azure/README.md
-├── versions.tf    # Optional: use when running with one Terraform/provider version
+├── gcp/           # Google Cloud modules — see gcp/README.md
+├── aws/           # AWS modules — see aws/README.md
+├── azure/         # Azure modules — see azure/README.md
+├── versions.tf    # Optional: root Terraform/provider version constraints
 └── README.md      # This file
 ```
 
-**Terraform version:** Modules are version-agnostic. Use the root `versions.tf` in the directory where you run Terraform when you want a single version for all modules.
+**Terraform version:** Modules are version-agnostic. Use the root `versions.tf` where you run Terraform to pin versions if you want.
