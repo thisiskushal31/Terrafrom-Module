@@ -28,6 +28,16 @@ Standalone Terraform modules for **Amazon Web Services**. Each module covers one
 | **cloudwatch** | CloudWatch log group | Centralized logs; retention and optional KMS |
 | **eventbridge** | EventBridge rule + optional target | Event routing, scheduled rules, cross-service events |
 | **emr** | EMR cluster (minimal) | Big data / Spark on AWS |
+| **security-group** | Security group with ingress/egress rules | EC2, RDS, ALB, Lambda VPC, EKS nodes, ElastiCache |
+| **ssm-parameter** | SSM Parameter Store parameter (String / SecureString) | Config and secrets; complements secrets-manager |
+| **acm** | ACM certificate (public) | TLS for ALB, CloudFront, API Gateway; caller does DNS validation |
+| **elasticache** | ElastiCache Redis replication group (+ optional subnet group) | Caching, session store, pub/sub |
+| **autoscaling** | Auto Scaling group | Scale EC2 behind ALB/NLB; use with launch template from caller |
+| **apigateway-v2** | API Gateway v2 HTTP API (+ optional integration & stage) | Serverless APIs in front of Lambda or HTTP |
+| **redshift** | Redshift cluster + optional subnet group | Data warehouse / analytics |
+| **step-functions** | Step Functions state machine | Workflow orchestration, ETL, event-driven pipelines |
+| **ecs** | ECS cluster + optional Fargate/EC2 service | Containers without Kubernetes; task definition from caller |
+| **msk** | MSK (Managed Kafka) cluster | Event streaming |
 
 Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and its own `README.md`. Code is standalone (no internal module calls).
 
@@ -37,9 +47,9 @@ Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and its 
 
 - **Start with networking:** Create a **vpc** first; pass `private_subnet_ids` / `public_subnet_ids` to **eks**, **rds**, **ec2-instance**, or **lambda** (when using VPC).
 - **Containers:** Use **ecr** for images; use **eks** for Kubernetes or add **ecs** later for Fargate. Wire **alb** in front of EKS Ingress or ECS services.
-- **Apps and APIs:** **lambda** + **api gateway** (future) for serverless; **ec2-instance** for long-lived VMs; **rds** for DB; **secrets-manager** or **ssm-parameter** (future) for config.
-- **Data and events:** **s3-bucket** for storage; **dynamodb-table** for serverless DB; **sqs** + **sns** or **eventbridge** for queues and events; **emr** for Spark/batch.
-- **Identity and security:** Create an **iam** role and pass its ARN to **lambda**, **ec2-instance**, or **eks** node config; use **kms** for encryption; **route53** for DNS.
+- **Apps and APIs:** **lambda** + **apigateway-v2** for serverless APIs; **ec2-instance** for VMs; **rds** for DB; **secrets-manager** or **ssm-parameter** for config; **acm** for TLS certs.
+- **Data and events:** **s3-bucket** for storage; **dynamodb-table** for serverless DB; **sqs** + **sns** or **eventbridge** for queues and events; **emr** for Spark/batch; **redshift** for warehouse; **msk** for Kafka; **step-functions** for workflows.
+- **Identity and security:** Create **security-group** and **iam** roles; pass to **lambda**, **ec2-instance**, **eks**, **rds**, **elasticache**, **ecs**, **msk**; use **kms** for encryption; **route53** for DNS.
 
 For cross-cloud comparison (GCP ↔ AWS ↔ Azure), see the main [README](../README.md#cross-cloud-counterparts).
 
@@ -87,6 +97,6 @@ module "eks" {
 
 ---
 
-## Possible future modules
+## Other services
 
-Higher-impact additions you could add from the same patterns: **security-group**, **ssm-parameter**, **acm**, **elasticache**, **autoscaling**, **apigateway-v2**, **redshift**, **step-functions**, **ecs**, **msk**. For services not in your clone (e.g. Cognito, Glue, SageMaker, Kinesis, WAF), use the Terraform Registry or minimal custom modules.
+For services not in this set (e.g. **Cognito**, **Glue**, **SageMaker**, **Kinesis**, **WAF**), use the [Terraform Registry](https://registry.terraform.io/search/modules?provider=aws) or minimal custom modules.
