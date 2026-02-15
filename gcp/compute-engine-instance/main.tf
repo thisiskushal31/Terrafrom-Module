@@ -5,7 +5,9 @@
  */
 
 locals {
-  metadata_map = var.ssh_keys != null && var.ssh_keys != "" ? merge(var.metadata, { "ssh-keys" = var.ssh_keys }) : var.metadata
+  ssh_metadata     = var.ssh_keys != null && var.ssh_keys != "" ? { "ssh-keys" = var.ssh_keys } : {}
+  startup_metadata = var.startup_script != null && var.startup_script != "" ? { "startup-script" = var.startup_script } : (var.startup_script_url != null && var.startup_script_url != "" ? { "startup-script-url" = var.startup_script_url } : {})
+  metadata_map     = merge(var.metadata, local.ssh_metadata, local.startup_metadata)
 }
 
 resource "google_compute_instance" "vm" {

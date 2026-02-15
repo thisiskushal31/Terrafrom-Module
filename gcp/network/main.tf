@@ -1,6 +1,11 @@
 /**
- * Standalone module: VPC (network), subnets, routes, firewall rules, and optional Private Service Access.
- * Single VPC module per GCP naming. Only google_compute_* and google_service_networking_connection—no module calls.
+ * Network module: full VPC surface. Only google_compute_* and google_service_networking_connection—no module calls.
+ * - VPC (create, routing mode, MTU)
+ * - Subnets (secondary ranges, private access, flow logs)
+ * - Routes (gateway, IP, instance, VPC peering, internal LB)
+ * - Firewall ingress/egress (allow/deny, tags, service accounts, log_config, disabled)
+ * - VPC peering (export/import custom and subnet routes)
+ * - Private Service Access (reserved range + service networking connection)
  */
 
 resource "google_compute_network" "vpc" {
@@ -30,6 +35,15 @@ resource "google_compute_subnetwork" "subnets" {
       ip_cidr_range = secondary_ip_range.value.ip_cidr_range
     }
   }
+
+  dynamic "log_config" {
+    for_each = try(var.subnet_flow_logs[each.value.subnet_name], null) != null ? [var.subnet_flow_logs[each.value.subnet_name]] : []
+    content {
+      aggregation_interval = try(log_config.value.aggregation_interval, "INTERVAL_5_SEC")
+      flow_sampling        = try(log_config.value.flow_sampling, 0.5)
+      metadata             = try(log_config.value.metadata, "INCLUDE_ALL_METADATA")
+    }
+  }
 }
 
 resource "google_compute_route" "routes" {
@@ -39,11 +53,12 @@ resource "google_compute_route" "routes" {
   name     = each.value.name
   network  = google_compute_network.vpc.name
   dest_range = each.value.dest_range
-  next_hop_gateway = try(each.value.next_hop_gateway, null)
-  next_hop_ip      = try(each.value.next_hop_ip, null)
-  next_hop_instance = try(each.value.next_hop_instance, null)
+  next_hop_gateway     = try(each.value.next_hop_gateway, null)
+  next_hop_ip          = try(each.value.next_hop_ip, null)
+  next_hop_instance    = try(each.value.next_hop_instance, null)
   next_hop_vpc_peering = try(each.value.next_hop_vpc_peering, null)
-  priority = try(each.value.priority, 1000)
+  next_hop_ilb         = try(each.value.next_hop_ilb, null)
+  priority             = try(each.value.priority, 1000)
 }
 
 resource "google_compute_firewall" "ingress" {
@@ -56,9 +71,20 @@ resource "google_compute_firewall" "ingress" {
   priority  = try(each.value.priority, 1000)
   description = try(each.value.description, null)
 
-  source_ranges = try(each.value.source_ranges, [])
-  source_tags   = try(each.value.source_tags, null)
-  target_tags   = try(each.value.target_tags, null)
+  source_ranges            = try(each.value.source_ranges, [])
+  source_tags              = try(each.value.source_tags, null)
+  source_service_accounts  = try(each.value.source_service_accounts, null)
+  target_tags              = try(each.value.target_tags, null)
+  target_service_accounts  = try(each.value.target_service_accounts, null)
+  disabled                 = try(each.value.disabled, false)
+
+  dynamic "log_config" {
+    for_each = try(each.value.log_config, null) != null ? [each.value.log_config] : []
+    content {
+      metadata = log_config.value.metadata
+      filter   = try(log_config.value.filter, null)
+    }
+  }
 
   dynamic "allow" {
     for_each = try(each.value.allow, [])
@@ -86,8 +112,18 @@ resource "google_compute_firewall" "egress" {
   priority  = try(each.value.priority, 1000)
   description = try(each.value.description, null)
 
-  destination_ranges = try(each.value.destination_ranges, [])
-  target_tags        = try(each.value.target_tags, null)
+  destination_ranges     = try(each.value.destination_ranges, [])
+  target_tags             = try(each.value.target_tags, null)
+  target_service_accounts = try(each.value.target_service_accounts, null)
+  disabled                = try(each.value.disabled, false)
+
+  dynamic "log_config" {
+    for_each = try(each.value.log_config, null) != null ? [each.value.log_config] : []
+    content {
+      metadata = log_config.value.metadata
+      filter   = try(log_config.value.filter, null)
+    }
+  }
 
   dynamic "allow" {
     for_each = try(each.value.allow, [])
@@ -103,6 +139,19 @@ resource "google_compute_firewall" "egress" {
       ports    = try(deny.value.ports, null)
     }
   }
+}
+
+# VPC peering (peer this VPC with another network)
+resource "google_compute_network_peering" "peering" {
+  for_each = { for i, p in var.peerings : "${p.name}-${i}" => p }
+
+  name         = each.value.name
+  network      = google_compute_network.vpc.self_link
+  peer_network = each.value.peer_network
+  export_custom_routes    = try(each.value.export_custom_routes, false)
+  import_custom_routes    = try(each.value.import_custom_routes, false)
+  export_subnet_routes_with_public_ip = try(each.value.export_subnet_routes_with_public_ip, false)
+  import_subnet_routes_with_public_ip = try(each.value.import_subnet_routes_with_public_ip, false)
 }
 
 # Private Service Access (optional): VPC peering for Cloud SQL private IP, etc.

@@ -28,6 +28,11 @@ output "route_names" {
   value       = [for r in google_compute_route.routes : r.name]
 }
 
+output "peering_names" {
+  description = "Created VPC peering names"
+  value       = [for p in google_compute_network_peering.peering : p.name]
+}
+
 # Private Service Access (when enable_private_service_access = true)
 output "private_service_access_reserved_range_name" {
   description = "Name of the reserved range for Private Service Access"

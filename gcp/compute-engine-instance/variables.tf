@@ -72,6 +72,18 @@ variable "ssh_keys" {
   default     = null
 }
 
+variable "startup_script" {
+  description = "Startup script content (e.g. file(\"script.sh\") or templatefile(...)). Used only if startup_script_url is not set."
+  type        = string
+  default     = null
+}
+
+variable "startup_script_url" {
+  description = "GCS URL of startup script (gs://bucket/path). If set, takes precedence over startup_script."
+  type        = string
+  default     = null
+}
+
 variable "service_account_email" {
   description = "Service account email for the instance"
   type        = string

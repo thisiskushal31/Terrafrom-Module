@@ -22,6 +22,17 @@ module "my_vm" {
 }
 ```
 
+**Startup script (optional):** Pass inline content or a GCS URL. Use `startup_script` with `file()` or `templatefile()` to run a script from a file at apply time:
+
+```hcl
+module "my_vm" {
+  source        = "./gcp/compute-engine-instance"
+  # ... other vars ...
+  startup_script = file("${path.module}/scripts/init.sh")
+  # Or from GCS only: startup_script_url = "gs://my-bucket/scripts/init.sh"
+}
+```
+
 ## Inputs / Outputs
 
-See `variables.tf` and `outputs.tf`. Required: `project_id`, `zone`, `instance_name`, `subnetwork`, `service_account_email`.
+See `variables.tf` and `outputs.tf`. Required: `project_id`, `zone`, `instance_name`, `subnetwork`, `service_account_email`. Optional: `startup_script`, `startup_script_url`.
