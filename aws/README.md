@@ -31,7 +31,7 @@ Standalone Terraform modules for **Amazon Web Services**. Each module manages on
 | **security-group** | Security group with configurable ingress/egress rules | Firewall for EC2, RDS, ALB, Lambda VPC, EKS, ElastiCache |
 | **ssm-parameter** | SSM Parameter Store parameter (String / SecureString) | Config and secrets; complements secrets-manager |
 | **acm** | ACM certificate (public) | TLS for ALB, CloudFront, API Gateway; you handle DNS validation |
-| **elasticache** | ElastiCache Redis replication group and optional subnet group | Caching, session store, pub/sub |
+| **elasticache** | ElastiCache Redis replication group and optional subnet group | Managed Redis (counterpart to GCP Memorystore, Azure Cache for Redis) |
 | **autoscaling** | Auto Scaling group | Scale EC2 behind ALB/NLB; use with a launch template from caller |
 | **apigateway-v2** | API Gateway v2 HTTP API with optional integration and stage | Serverless APIs in front of Lambda or HTTP |
 | **redshift** | Redshift cluster and optional subnet group | Data warehouse and analytics |

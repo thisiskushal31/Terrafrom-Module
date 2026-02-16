@@ -28,5 +28,13 @@ terraform {
       source  = "hashicorp/archive"
       version = ">= 2.0"
     }
+    rediscloud = {
+      source  = "RedisLabs/rediscloud"
+      version = ">= 1.0"
+    }
+    confluent = {
+      source  = "confluentinc/confluent"
+      version = ">= 1.0"
+    }
   }
 }

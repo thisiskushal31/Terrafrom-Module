@@ -39,6 +39,7 @@ Standalone Terraform modules for **Google Cloud**. Each module manages one GCP p
 | **group** | Cloud Identity Group (owners, managers, members) | Identity and access |
 | **iam** | Project IAM bindings | Roles and permissions at project level |
 | **service-accounts** | Service accounts and project roles | Workload identity |
+| **memorystore-redis** | Memorystore for Redis instance (BASIC or STANDARD_HA) | Managed Redis (counterpart to AWS ElastiCache, Azure Cache for Redis) |
 
 Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and a per-module `README.md`. No internal `module { source = "..." }` calls.
 

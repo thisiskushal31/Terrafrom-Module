@@ -17,6 +17,7 @@ Standalone Terraform modules for **Microsoft Azure**. Each module manages one Az
 | **load-balancer** | Azure Load Balancer with backend pool, optional health probe, and rules | Load balancing for VMs or AKS |
 | **postgresql** | PostgreSQL Flexible Server and optional databases | Managed relational DB |
 | **storage-account** | Storage account and optional blob containers | Object storage (blobs) |
+| **redis-cache** | Azure Cache for Redis (Basic, Standard, Premium) | Managed Redis (counterpart to AWS ElastiCache, GCP Memorystore) |
 
 Each module has `versions.tf`, `main.tf`, `variables.tf`, `outputs.tf`, and a per-module `README.md`. No internal `module { source = "..." }` calls.
 
